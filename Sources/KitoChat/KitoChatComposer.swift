@@ -227,10 +227,10 @@ public struct KitoChatComposer: View {
                     .foregroundStyle(theme.colors.onSurface)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: Int(recorder.elapsed))
-                KitoWaveformView(samples: padded, progress: 1, activeColor: theme.colors.danger.opacity(0.85), barWidth: 2.5, spacing: 2)
+                KitoChatWaveformView(samples: padded, progress: 1, activeColor: theme.colors.danger.opacity(0.85), barWidth: 2.5, spacing: 2)
                     .frame(height: 22)
                     .frame(maxWidth: isLocked ? .infinity : 70)
-                    .animation(.linear(duration: 0.05), value: recorder.levels.count)
+                    .animation(reduceMotion ? nil : .linear(duration: 0.05), value: recorder.levels.count)
                 if !isLocked {
                     Spacer(minLength: 0)
                     KitoSlideToCancelLabel(color: theme.colors.onSurface.opacity(0.6), reduceMotion: reduceMotion)
@@ -266,7 +266,7 @@ public struct KitoChatComposer: View {
                     .fill(accent.tint.opacity(0.18))
                     .frame(width: 38, height: 38)
                     .scaleEffect(reduceMotion ? 1.7 : 1.6 + CGFloat(recorder.levels.last ?? 0) * 0.7)
-                    .animation(.easeOut(duration: 0.08), value: recorder.levels.count)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.08), value: recorder.levels.count)
             }
             Circle()
                 .fill(accent.tint)
@@ -402,13 +402,17 @@ private struct KitoRecordingDot: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Circle()
-            .fill(color)
-            .frame(width: 10, height: 10)
-            .phaseAnimator([1.0, 0.25]) { dot, phase in
-                dot.opacity(reduceMotion ? 1 : phase)
-            } animation: { _ in .easeInOut(duration: 0.6) }
-            .accessibilityHidden(true)
+        let dot = Circle().fill(color).frame(width: 10, height: 10)
+        Group {
+            if reduceMotion {
+                dot
+            } else {
+                dot.phaseAnimator([1.0, 0.25]) { dot, phase in
+                    dot.opacity(phase)
+                } animation: { _ in .easeInOut(duration: 0.6) }
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 
@@ -417,14 +421,20 @@ private struct KitoSlideToCancelLabel: View {
     let reduceMotion: Bool
 
     var body: some View {
-        HStack(spacing: 2) {
+        let label = HStack(spacing: 2) {
             Image(systemName: "chevron.left").font(.system(size: 11, weight: .bold))
             Text("Slide to cancel").font(.system(size: 14, weight: .medium))
         }
         .foregroundStyle(color)
-        .phaseAnimator([0.0, -6.0]) { label, phase in
-            label.offset(x: reduceMotion ? 0 : phase)
-        } animation: { _ in .easeInOut(duration: 0.7) }
+        Group {
+            if reduceMotion {
+                label
+            } else {
+                label.phaseAnimator([0.0, -6.0]) { label, phase in
+                    label.offset(x: phase)
+                } animation: { _ in .easeInOut(duration: 0.7) }
+            }
+        }
         .lineLimit(1)
         .fixedSize()
         .accessibilityLabel("Slide left to cancel")
@@ -442,12 +452,16 @@ private struct KitoLockIndicator: View {
                 .font(.system(size: 14, weight: .semibold))
                 .contentTransition(.symbolEffect(.replace))
                 .offset(y: progress * 6)
-            Image(systemName: "chevron.up")
+            let chevron = Image(systemName: "chevron.up")
                 .font(.system(size: 11, weight: .bold))
                 .opacity(1 - Double(progress))
-                .phaseAnimator([0.0, -4.0]) { chevron, phase in
-                    chevron.offset(y: reduceMotion ? 0 : phase)
+            if reduceMotion {
+                chevron
+            } else {
+                chevron.phaseAnimator([0.0, -4.0]) { chevron, phase in
+                    chevron.offset(y: phase)
                 } animation: { _ in .easeInOut(duration: 0.5) }
+            }
         }
         .foregroundStyle(progress >= 1 ? tint : .secondary)
         .frame(width: 36, height: 76 - progress * 20)

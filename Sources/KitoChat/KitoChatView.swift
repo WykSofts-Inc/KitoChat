@@ -60,6 +60,16 @@ public struct KitoChatView: View {
 
     private static let bottomID = "kito.chat.bottom"
 
+    /// Creates a conversation that hands every sent message to `onSend`.
+    ///
+    /// `onSend` is the last parameter, so it can be written as a trailing closure. Add
+    /// `onAttach:` before it to show the attachment button:
+    ///
+    /// ```swift
+    /// KitoChatView(messages: $messages, currentUser: me, onAttach: { pickPhoto() }) { message in
+    ///     deliver(message)
+    /// }
+    /// ```
     public init(
         messages: Binding<[KitoChatMessage]>,
         currentUser: KitoChatUser,
@@ -71,7 +81,7 @@ public struct KitoChatView: View {
         placeholder: String = "Message",
         tint: Color? = nil,
         onAttach: (() -> Void)? = nil,
-        onSend: ((KitoChatMessage) -> Void)? = nil
+        onSend: ((KitoChatMessage) -> Void)?
     ) {
         _messages = messages
         self.currentUser = currentUser
@@ -84,6 +94,28 @@ public struct KitoChatView: View {
         self.tint = tint
         self.onAttach = onAttach
         self.onSend = onSend
+    }
+
+    /// Creates a conversation without a send handler — for read-only threads, or when you only
+    /// need `onAttach`. The view still appends what's typed to `messages`.
+    @_disfavoredOverload
+    public init(
+        messages: Binding<[KitoChatMessage]>,
+        currentUser: KitoChatUser,
+        style: KitoChatBubbleStyle = .modern,
+        wallpaper: KitoChatWallpaper = .plain,
+        typingUsers: [KitoChatUser] = [],
+        unreadCount: Int = 0,
+        showsComposer: Bool = true,
+        placeholder: String = "Message",
+        tint: Color? = nil,
+        onAttach: (() -> Void)? = nil
+    ) {
+        self.init(
+            messages: messages, currentUser: currentUser, style: style, wallpaper: wallpaper,
+            typingUsers: typingUsers, unreadCount: unreadCount, showsComposer: showsComposer,
+            placeholder: placeholder, tint: tint, onAttach: onAttach, onSend: nil
+        )
     }
 
     private var accent: KitoChatAccent { KitoChatAccent(tint: tint, theme: theme, environment: environment) }
@@ -250,7 +282,7 @@ public struct KitoChatView: View {
             if isGroup, let first = typingUsers.first {
                 KitoChatAvatar(first, size: 28, showsOnlineStatus: false)
             }
-            KitoTypingIndicator(style: style)
+            KitoChatTypingIndicator(style: style)
             Spacer(minLength: 0)
         }
         .padding(.top, theme.spacing.sm)

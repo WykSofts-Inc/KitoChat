@@ -1,5 +1,5 @@
 //
-//  KitoWaveformTests.swift
+//  KitoChatWaveformTests.swift
 //  KitoChat
 //
 //  Created by Wycliff on 9/23/26.
@@ -9,56 +9,56 @@
 import XCTest
 @testable import KitoChat
 
-final class KitoWaveformTests: XCTestCase {
+final class KitoChatWaveformTests: XCTestCase {
     func testDownsampleReturnsExactlyTheBarCount() {
         let samples = (0..<1_000).map { Float(sin(Double($0) / 20)) }
-        XCTAssertEqual(KitoWaveform.downsample(samples, to: 40).count, 40)
-        XCTAssertEqual(KitoWaveform.downsample(samples, to: 7).count, 7)
+        XCTAssertEqual(KitoChatWaveform.downsample(samples, to: 40).count, 40)
+        XCTAssertEqual(KitoChatWaveform.downsample(samples, to: 7).count, 7)
     }
 
     func testDownsampleKeepsPeaksAndNormalises() {
         let samples: [Float] = [0.1, 0.2, 0.5, 0.1, 0.25, 0.05]
-        XCTAssertEqual(KitoWaveform.downsample(samples, to: 3), [0.4, 1, 0.5])
+        XCTAssertEqual(KitoChatWaveform.downsample(samples, to: 3), [0.4, 1, 0.5])
     }
 
     func testDownsampleUsesMagnitudes() {
-        XCTAssertEqual(KitoWaveform.downsample([-0.8, 0.2, 0.4, -0.2], to: 2), [1, 0.5])
+        XCTAssertEqual(KitoChatWaveform.downsample([-0.8, 0.2, 0.4, -0.2], to: 2), [1, 0.5])
     }
 
     func testDownsampleStretchesShortInput() {
-        let bars = KitoWaveform.downsample([0.5, 1], to: 4)
+        let bars = KitoChatWaveform.downsample([0.5, 1], to: 4)
         XCTAssertEqual(bars, [0.5, 0.5, 1, 1])
     }
 
     func testDownsampleEdgeCases() {
-        XCTAssertEqual(KitoWaveform.downsample([], to: 10), [])
-        XCTAssertEqual(KitoWaveform.downsample([0.3], to: 0), [])
-        XCTAssertEqual(KitoWaveform.downsample([0, 0, 0], to: 3), [0, 0, 0])
-        XCTAssertEqual(KitoWaveform.downsample([.nan, 0.5], to: 2), [0, 1])
+        XCTAssertEqual(KitoChatWaveform.downsample([], to: 10), [])
+        XCTAssertEqual(KitoChatWaveform.downsample([0.3], to: 0), [])
+        XCTAssertEqual(KitoChatWaveform.downsample([0, 0, 0], to: 3), [0, 0, 0])
+        XCTAssertEqual(KitoChatWaveform.downsample([.nan, 0.5], to: 2), [0, 1])
     }
 
     func testNormalized() {
-        XCTAssertEqual(KitoWaveform.normalized([0.25, 0.5]), [0.5, 1])
-        XCTAssertEqual(KitoWaveform.normalized([]), [])
+        XCTAssertEqual(KitoChatWaveform.normalized([0.25, 0.5]), [0.5, 1])
+        XCTAssertEqual(KitoChatWaveform.normalized([]), [])
     }
 
     func testLevelFromDecibels() {
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: 0), 1)
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: -25), 0.5, accuracy: 0.0001)
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: -80), 0)
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: 6), 1)
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: -.infinity), 0)
-        XCTAssertEqual(KitoWaveform.level(fromDecibels: -30, floor: -60), 0.5, accuracy: 0.0001)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: 0), 1)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: -25), 0.5, accuracy: 0.0001)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: -80), 0)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: 6), 1)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: -.infinity), 0)
+        XCTAssertEqual(KitoChatWaveform.level(fromDecibels: -30, floor: -60), 0.5, accuracy: 0.0001)
     }
 
     func testPlaceholderIsDeterministicAndInRange() {
-        let a = KitoWaveform.placeholder(count: 32, seed: 42)
-        XCTAssertEqual(a, KitoWaveform.placeholder(count: 32, seed: 42))
-        XCTAssertNotEqual(a, KitoWaveform.placeholder(count: 32, seed: 43))
+        let a = KitoChatWaveform.placeholder(count: 32, seed: 42)
+        XCTAssertEqual(a, KitoChatWaveform.placeholder(count: 32, seed: 42))
+        XCTAssertNotEqual(a, KitoChatWaveform.placeholder(count: 32, seed: 43))
         XCTAssertEqual(a.count, 32)
         XCTAssertTrue(a.allSatisfy { (0...1).contains($0) })
-        XCTAssertEqual(KitoWaveform.placeholder(count: 0), [])
-        XCTAssertEqual(KitoWaveform.placeholder(count: 5, seed: 0).count, 5)
+        XCTAssertEqual(KitoChatWaveform.placeholder(count: 0), [])
+        XCTAssertEqual(KitoChatWaveform.placeholder(count: 5, seed: 0).count, 5)
     }
 
     func testPlaybackSpeedCycles() {
