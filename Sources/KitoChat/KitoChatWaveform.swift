@@ -121,6 +121,7 @@ public struct KitoChatWaveformView: View {
     private let onScrub: ((Double) -> Void)?
 
     @Environment(\.kitoTheme) private var theme
+    @Environment(\.layoutDirection) private var layoutDirection
 
     public init(
         samples: [Float],
@@ -166,7 +167,9 @@ public struct KitoChatWaveformView: View {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 guard width > 0 else { return }
-                onScrub?(min(1, max(0, value.location.x / width)))
+                // The bars fill from the leading edge; location is physical.
+                let x = layoutDirection == .rightToLeft ? width - value.location.x : value.location.x
+                onScrub?(min(1, max(0, x / width)))
             }
     }
 }

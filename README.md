@@ -139,6 +139,14 @@ springs, bouncing dots and lifts for fades. Colours and fonts come from `kitoThe
 dark mode follow your theme; bubbles, rows and the composer grow with their text rather than
 truncating it.
 
+## Right-to-left
+
+Layout mirrors automatically: outgoing bubbles sit on the trailing side, tails, receipts and the
+reaction chips follow them, and back, reply and "slide to cancel" symbols point the reading way.
+Swipe-to-reply follows the finger toward the trailing edge, slide-to-cancel runs toward the leading
+edge, voice-note scrubbing fills from the leading edge, and the long-press menu and photo viewer
+track the finger in right-to-left layouts too. Nothing to set up beyond the app's layout direction.
+
 ## Migrating to 0.2
 
 Three public names were renamed so KitoChat can be imported next to KitoLoaders, KitoIslandBar and
