@@ -34,6 +34,7 @@ public struct KitoChatComposer: View {
     @Environment(\.kitoTheme) private var theme
     @Environment(\.self) private var environment
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     @FocusState private var isFocused: Bool
 
     @State private var recorder = KitoVoiceRecorder()
@@ -164,7 +165,7 @@ public struct KitoChatComposer: View {
 
     private func replyPreview(_ reply: KitoChatReply, accent: KitoChatAccent) -> some View {
         HStack(spacing: theme.spacing.sm) {
-            Image(systemName: "arrowshape.turn.up.left.fill")
+            Image(systemName: "arrowshape.turn.up.backward.fill")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(accent.tint)
             Capsule().fill(accent.tint).frame(width: 3, height: 34)
@@ -311,10 +312,15 @@ public struct KitoChatComposer: View {
                     if !showsSend { beginRecording() }
                 }
                 guard recorder.phase == .recording, pressStartedRecording else { return }
-                withAnimation(.interactiveSpring) { drag = value.translation }
-                if value.translation.width < -cancelDistance {
+                // Width is semantic: negative = toward the leading edge (right in right-to-left layouts).
+                let semantic = CGSize(
+                    width: value.translation.width * (layoutDirection == .rightToLeft ? -1 : 1),
+                    height: value.translation.height
+                )
+                withAnimation(.interactiveSpring) { drag = semantic }
+                if semantic.width < -cancelDistance {
                     cancelRecording()
-                } else if value.translation.height < -lockDistance {
+                } else if semantic.height < -lockDistance {
                     recorder.lock()
                     lockCount += 1
                     withAnimation(spring) { drag = .zero }
@@ -420,9 +426,11 @@ private struct KitoSlideToCancelLabel: View {
     let color: Color
     let reduceMotion: Bool
 
+    @Environment(\.layoutDirection) private var layoutDirection
+
     var body: some View {
         let label = HStack(spacing: 2) {
-            Image(systemName: "chevron.left").font(.system(size: 11, weight: .bold))
+            Image(systemName: "chevron.backward").font(.system(size: 11, weight: .bold))
             Text("Slide to cancel").font(.system(size: 14, weight: .medium))
         }
         .foregroundStyle(color)
@@ -437,7 +445,7 @@ private struct KitoSlideToCancelLabel: View {
         }
         .lineLimit(1)
         .fixedSize()
-        .accessibilityLabel("Slide left to cancel")
+        .accessibilityLabel(layoutDirection == .rightToLeft ? "Slide right to cancel" : "Slide left to cancel")
     }
 }
 

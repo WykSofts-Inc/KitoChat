@@ -231,7 +231,7 @@ public struct KitoChatHeader: View {
         HStack(spacing: theme.spacing.sm + 2) {
             if let onBack {
                 Button(action: onBack) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: "chevron.backward")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(theme.colors.onSurface)
                         .frame(width: 36, height: 36)

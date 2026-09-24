@@ -471,6 +471,7 @@ struct KitoMessageRow: View {
 
     @Environment(\.kitoTheme) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     @State private var swipe: CGFloat = 0
     @State private var isSwiping = false
     @State private var passedThreshold = false
@@ -492,7 +493,7 @@ struct KitoMessageRow: View {
         let progress = KitoSwipeReply.progress(for: swipe)
         return VStack(alignment: isOutgoing ? .trailing : .leading, spacing: 3) {
             ZStack(alignment: .leading) {
-                Image(systemName: "arrowshape.turn.up.left.fill")
+                Image(systemName: "arrowshape.turn.up.backward.fill")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(passedThreshold ? tint : theme.colors.onSurface.opacity(0.6))
                     .frame(width: 30, height: 30)
@@ -593,7 +594,9 @@ struct KitoMessageRow: View {
     private var swipeGesture: some Gesture {
         DragGesture(minimumDistance: 14)
             .onChanged { value in
-                let dx = value.translation.width, dy = value.translation.height
+                // Positive = toward the trailing edge, so the row follows the finger in right-to-left layouts too.
+                let dx = value.translation.width * (layoutDirection == .rightToLeft ? -1 : 1)
+                let dy = value.translation.height
                 if !isSwiping {
                     guard dx > 0, abs(dx) > abs(dy) * 1.6 else { return }
                     isSwiping = true

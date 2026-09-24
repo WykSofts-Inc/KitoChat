@@ -38,6 +38,7 @@ struct KitoReactionOverlay<Bubble: View>: View {
 
     @Environment(\.kitoTheme) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     @State private var isShown = false
 
     private let barHeight: CGFloat = 52
@@ -73,7 +74,7 @@ struct KitoReactionOverlay<Bubble: View>: View {
                 .frame(width: rect.width, height: rect.height)
                 .scaleEffect(isShown && !reduceMotion ? 1.04 : 1, anchor: isOutgoing ? .trailing : .leading)
                 .shadow(color: .black.opacity(isShown ? 0.18 : 0), radius: 18, y: 8)
-                .position(x: rect.midX, y: rect.midY + lifted)
+                .position(x: layoutRect.midX, y: rect.midY + lifted)
                 .allowsHitTesting(false)
 
             emojiBar
@@ -88,8 +89,18 @@ struct KitoReactionOverlay<Bubble: View>: View {
         .accessibilityAction(.escape) { close(then: onDismiss) }
     }
 
+    /// `rect` comes from an anchor and is physical (left-to-right), while `.position` is mirrored in
+    /// right-to-left layouts, so x is measured from the leading edge here.
+    private var layoutRect: CGRect {
+        guard layoutDirection == .rightToLeft else { return rect }
+        var mirrored = rect
+        mirrored.origin.x = container.width - rect.maxX
+        return mirrored
+    }
+
     private func clampedX(width: CGFloat) -> CGFloat {
         let margin: CGFloat = 8
+        let rect = layoutRect
         let preferred = isOutgoing ? rect.maxX - width / 2 : rect.minX + width / 2
         return min(max(preferred, width / 2 + margin), container.width - width / 2 - margin)
     }
@@ -124,7 +135,7 @@ struct KitoReactionOverlay<Bubble: View>: View {
 
     private var menu: some View {
         VStack(spacing: 0) {
-            menuRow("Reply", symbol: "arrowshape.turn.up.left", color: theme.colors.onSurface) { close(then: onReply) }
+            menuRow("Reply", symbol: "arrowshape.turn.up.backward", color: theme.colors.onSurface) { close(then: onReply) }
             if canCopy {
                 Divider()
                 menuRow("Copy", symbol: "doc.on.doc", color: theme.colors.onSurface) { close(then: onCopy) }
@@ -190,6 +201,7 @@ struct KitoImageViewer: View {
     let onClose: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     @State private var dragOffset: CGSize = .zero
     @State private var zoom: CGFloat = 1
     @State private var committedZoom: CGFloat = 1
@@ -251,7 +263,9 @@ struct KitoImageViewer: View {
         DragGesture()
             .onChanged { value in
                 guard zoom <= 1 else { return }
-                dragOffset = value.translation
+                // Translation is physical; `.offset` is mirrored in right-to-left layouts.
+                let sign: CGFloat = layoutDirection == .rightToLeft ? -1 : 1
+                dragOffset = CGSize(width: value.translation.width * sign, height: value.translation.height)
             }
             .onEnded { value in
                 guard zoom <= 1 else { return }
