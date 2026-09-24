@@ -1,5 +1,5 @@
 //
-//  KitoWaveform.swift
+//  KitoChatWaveform.swift
 //  KitoChat
 //
 //  Created by Wycliff on 9/23/26.
@@ -12,7 +12,7 @@ import KitoCore
 // MARK: - Maths
 
 /// Waveform maths for voice notes: downsampling to bars, metering and demo shapes.
-public enum KitoWaveform {
+public enum KitoChatWaveform {
     /// Buckets `samples` into exactly `count` bars, each the peak magnitude of its bucket,
     /// scaled so the loudest bar is 1. Fewer samples than bars are stretched.
     public static func downsample(_ samples: [Float], to count: Int) -> [Float] {
@@ -109,9 +109,9 @@ enum KitoSwipeReply {
 /// Waveform bars with a playback progress fill. Drag across it to scrub when `onScrub` is set.
 ///
 /// ```swift
-/// KitoWaveformView(samples: KitoWaveform.placeholder(count: 32), progress: 0.4)
+/// KitoChatWaveformView(samples: KitoChatWaveform.placeholder(count: 32), progress: 0.4)
 /// ```
-public struct KitoWaveformView: View {
+public struct KitoChatWaveformView: View {
     private let samples: [Float]
     private let progress: Double
     private let activeColor: Color?

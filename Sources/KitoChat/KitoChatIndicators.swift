@@ -14,9 +14,9 @@ import KitoCore
 /// Three bouncing dots in an incoming bubble.
 ///
 /// ```swift
-/// if isTyping { KitoTypingIndicator(style: .imessage) }
+/// if isTyping { KitoChatTypingIndicator(style: .imessage) }
 /// ```
-public struct KitoTypingIndicator: View {
+public struct KitoChatTypingIndicator: View {
     private let style: KitoChatBubbleStyle
     private let dotColor: Color?
 

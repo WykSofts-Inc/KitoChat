@@ -76,7 +76,7 @@ final class KitoVoiceRecorder {
         guard phase != .idle else { return nil }
         let duration = elapsed
         let url = isSimulated ? nil : fileURL
-        let waveform = KitoWaveform.downsample(levels, to: 40)
+        let waveform = KitoChatWaveform.downsample(levels, to: 40)
         tearDown()
         guard duration >= Self.minimumDuration else {
             if let url { try? FileManager.default.removeItem(at: url) }
@@ -140,7 +140,7 @@ final class KitoVoiceRecorder {
         let level: Float
         if let recorder {
             recorder.updateMeters()
-            level = KitoWaveform.level(fromDecibels: recorder.averagePower(forChannel: 0))
+            level = KitoChatWaveform.level(fromDecibels: recorder.averagePower(forChannel: 0))
         } else {
             let t = Float(elapsed)
             let speech = abs(sin(t * 3.1) * sin(t * 7.3 + 1.2))

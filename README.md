@@ -93,7 +93,7 @@ input) the composer records a simulated, clearly labelled "Preview" instead; pas
 ## Presence
 
 ```swift
-KitoTypingIndicator(style: .imessage)
+KitoChatTypingIndicator(style: .imessage)
 KitoChatStatusTicks(message.status)
 KitoChatAvatar(amani, size: 48)            // initials on a stable gradient, or avatarURL; online dot
 KitoChatHeader(user: amani, typingUsers: typing, onCall: { … }, onVideo: { … })
@@ -126,7 +126,7 @@ KitoChatGrouping.positions(for: messages)          // [.first, .middle, .last, .
 KitoChatDateFormat.separatorTitle(for: date)       // "Today", "Yesterday", "Monday", "Sat 12 Sep"
 KitoChatDateFormat.listTimestamp(for: date)        // "14:05", "Yesterday", "Mon", "12/09/26"
 KitoChatDateFormat.typingText(for: ["Amani", "Baraka"])   // "Amani and Baraka are typing…"
-KitoWaveform.downsample(samples, to: 40)           // peak bars, normalised to 0…1
+KitoChatWaveform.downsample(samples, to: 40)           // peak bars, normalised to 0…1
 ```
 
 ## Accessibility
@@ -137,10 +137,25 @@ springs, bouncing dots and lifts for fades. Colours and fonts come from `kitoThe
 dark mode follow your theme; bubbles, rows and the composer grow with their text rather than
 truncating it.
 
+## Migrating to 0.2
+
+Three public names were renamed so KitoChat can be imported next to KitoLoaders, KitoIslandBar and
+KitoMediaPlayer without "ambiguous use" errors:
+
+| 0.1 | 0.2 |
+| --- | --- |
+| `KitoTypingIndicator` | `KitoChatTypingIndicator` |
+| `KitoWaveform` | `KitoChatWaveform` |
+| `KitoWaveformView` | `KitoChatWaveformView` |
+
+`KitoChatView`'s `onSend` is now the last parameter with no default, so a trailing closure always
+means `onSend` (before, it could bind to `onAttach`). Labelled calls — `onAttach: …, onSend: …` —
+and calls with no `onSend` at all compile as before.
+
 ## Installation
 
 ```swift
-.package(url: "https://github.com/WykSofts-Inc/KitoChat.git", from: "0.1.0")
+.package(url: "https://github.com/WykSofts-Inc/KitoChat.git", from: "0.2.0")
 ```
 
 ## License

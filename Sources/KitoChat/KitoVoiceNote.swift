@@ -126,7 +126,7 @@ struct KitoVoiceNoteContent: View {
         self.accent = accent
         self.foreground = foreground
         let seed = messageID.unicodeScalars.reduce(UInt64(7)) { ($0 &* 31) &+ UInt64($1.value) }
-        self.bars = KitoWaveform.downsample(waveform.isEmpty ? KitoWaveform.placeholder(count: 32, seed: seed) : waveform, to: 32)
+        self.bars = KitoChatWaveform.downsample(waveform.isEmpty ? KitoChatWaveform.placeholder(count: 32, seed: seed) : waveform, to: 32)
         _player = State(initialValue: KitoVoicePlayer(url: url, duration: duration))
     }
 
@@ -148,7 +148,7 @@ struct KitoVoiceNoteContent: View {
             .accessibilityLabel(player.isPlaying ? "Pause voice message" : "Play voice message")
 
             VStack(alignment: .leading, spacing: 4) {
-                KitoWaveformView(
+                KitoChatWaveformView(
                     samples: bars,
                     progress: player.progress,
                     activeColor: onFill ? foreground : accent.tint,
