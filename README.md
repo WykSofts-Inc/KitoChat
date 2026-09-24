@@ -1,5 +1,7 @@
 # KitoChat
 
+**[Documentation](https://wyksofts-inc.github.io/KitoChat/documentation/kitochat/)**
+
 A complete chat UI kit for SwiftUI: a conversation view with grouped bubbles, date separators,
 read receipts, reactions, swipe-to-reply, voice notes and photos; a composer that records voice
 notes; typing indicators; and an inbox. Part of the [Kito](https://github.com/WykSofts-Inc/KitoDevKit) ecosystem.
